@@ -1,5 +1,0 @@
-/home/rgb/Desktop/projects/terminet_backend/build/CMakeFiles/login_repo.dir
-/home/rgb/Desktop/projects/terminet_backend/build/CMakeFiles/app_helper.dir
-/home/rgb/Desktop/projects/terminet_backend/build/CMakeFiles/terminet.dir
-/home/rgb/Desktop/projects/terminet_backend/build/CMakeFiles/edit_cache.dir
-/home/rgb/Desktop/projects/terminet_backend/build/CMakeFiles/rebuild_cache.dir

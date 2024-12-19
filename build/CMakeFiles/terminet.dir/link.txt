@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file,CMakeFiles/terminet.dir/link.d CMakeFiles/terminet.dir/main.cpp.o -o terminet  -lpqxx liblogin_repo.a libapp_helper.a -lpqxx
