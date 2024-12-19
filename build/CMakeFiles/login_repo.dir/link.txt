@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblogin_repo.a CMakeFiles/login_repo.dir/db/login/login_repository.cpp.o
+/usr/bin/ranlib liblogin_repo.a
