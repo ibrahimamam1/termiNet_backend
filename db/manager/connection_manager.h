@@ -19,8 +19,10 @@ private:
 
 public:
   bool init(std::string connectionString);
-  std::unique_ptr<pqxx::connection> getConnection();
-  void releaseConnection(std::unique_ptr<pqxx::connection> connection);
+  int getConnectionIndex();
+  std::unique_ptr<pqxx::connection>getConnection(int index);
+  void releaseConnection(int index);
   static ConnectionManager *getInstance();
+  void closeConnections();
   ~ConnectionManager();
 };

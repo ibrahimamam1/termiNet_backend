@@ -21,40 +21,39 @@ bool ConnectionManager::init(std::string connectionString) {
   return true;
 }
 
-std::unique_ptr<pqxx::connection> ConnectionManager::getConnection() {
+int ConnectionManager::getConnectionIndex() {
 
   std::unique_lock<std::mutex> lock(free_connections_mutex);
   if (free_connections.empty()) {
     std::cerr << "No Connections available\n";
-    return nullptr;
+    return -1;
   }
 
   int index = free_connections.front();
   free_connections.pop();
+  return index;
+}
+
+std::unique_ptr<pqxx::connection> ConnectionManager::getConnection(int index){
   return std::move(connection_pool[index]);
 }
 
-void ConnectionManager::releaseConnection(
-    std::unique_ptr<pqxx::connection> connection) {
-  if (connection == nullptr) {
+void ConnectionManager::releaseConnection(int index) {
+  if (index == -1) {
     return;
   }
 
   std::unique_lock<std::mutex> lock(free_connections_mutex);
-
-  for (int i = 0; i < MAX_CONNECTION; i++) {
-    if (connection_pool[i].get() == connection.get()) {
-      free_connections.push(i);
-      return;
-    }
-  }
-
-  std::cerr
-      << "Could not find given connection on connection pool to release \n";
+  free_connections.push(index);
 }
 
 ConnectionManager *ConnectionManager::getInstance() {
   if (instance == nullptr)
     instance = new ConnectionManager();
   return instance;
+}
+void ConnectionManager::closeConnections(){
+  for(int i=0; i<MAX_CONNECTION; i++){
+    connection_pool[i]->close();
+  }
 }

@@ -1,5 +1,7 @@
-#pragma once;
+#pragma once
 #include <crow/json.h>
+
 class UserService{
-  static crow::json::wvalue& getUserWithId(int& id);
+public:
+  static crow::json::wvalue getUserWithEmail(std::string& email);
 };
