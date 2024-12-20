@@ -1,17 +1,19 @@
 #include "login_repository.h"
 #include "../manager/connection_manager.h"
 #include <memory>
+#include <pqxx/internal/statement_parameters.hxx>
 
 
-bool LoginRepository::login(const std::string &emailHash,
+pqxx::result LoginRepository::login(const std::string &emailHash,
                             const std::string &passwordHash,
                             std::string &message, int &error_code) {
   try {
-    std::unique_ptr<pqxx::connection> conn = ConnectionManager::getInstance()->getConnection();
+    int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
+    std::unique_ptr<pqxx::connection> conn = ConnectionManager::getInstance()->getConnection(conn_index);
     if (!conn->is_open()) {
       message = "Failed to Connect to Database";
-      error_code = 1;
-      return false;
+      error_code = 500;
+      return pqxx::result();
     }
 
     pqxx::work tx(*conn);
@@ -20,23 +22,18 @@ bool LoginRepository::login(const std::string &emailHash,
 
     if (r.empty()) {
       message = "Invalid username or password";
-      error_code = 2;
-      return false;
-    }
-
-    if (r[0][0].is_null()) {
-      message = "Login check result was null";
-      error_code = 3;
-      return false;
+      error_code = 404;
+      return r;
     }
 
     message = "Login successful";
-    error_code = 0;
-
-    return r[0][0].as<bool>();
+    error_code = 200;
+    
+    ConnectionManager::getInstance()->releaseConnection(conn_index);
+    return r;
   } catch (const std::exception &e) {
     message = e.what();
-    error_code = 4;
-    return false;
+    error_code = 500;
+    return pqxx::result();
   }
 }

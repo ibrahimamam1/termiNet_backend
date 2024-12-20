@@ -1,8 +1,10 @@
 #include <crow.h>
 #include <crow/json.h>
+#include <csignal>
 #include <iostream>
 #include <string>
 #include "services/login/login.h"
+#include "services/users/users.h"
 #include "helpers/ResponseHelper.h"
 #include "db/manager/connection_manager.h"
 
@@ -10,6 +12,17 @@
 
 int main(){
   crow::SimpleApp app;
+
+  //signal handlers for graceful shutdown
+  std::signal(SIGINT, [](int signal){
+    std::cout << "Shuting Down Server\n";
+    ConnectionManager::getInstance()->closeConnections(); 
+  });
+
+  std::signal(SIGTERM, [](int signal){
+    std::cout << "Shuting Down Server\n";
+    ConnectionManager::getInstance()->closeConnections(); 
+  });
 
   //initialise database connection
   ConnectionManager::getInstance()->init("dbname=terminet user=rgb password=");
@@ -20,16 +33,14 @@ int main(){
   
   // handle login check
   CROW_ROUTE(app, "/login/<string>/<string>")([](std::string email, std::string password){ 
-    int error_code = 0;
-    bool login_result = LoginService::check_login(email, password, error_code);
-    crow::json::wvalue response = ResponseHelper::make_response(200, "OK");
-    response["grant_access"] = login_result;
+    crow::json::wvalue response = LoginService::check_login(email, password);
     return response;
   });
   
   //handle getting a user information
-  /*CROW_ROUTE(app, "/users/<int>")([](int id){
-    
-  }); */
+  CROW_ROUTE(app, "/users/<string>")([](std::string email){
+    crow::json::wvalue response = UserService::getUserWithEmail(email);
+    return response;
+  }); 
   app.port(8080).multithreaded().run();
 }
