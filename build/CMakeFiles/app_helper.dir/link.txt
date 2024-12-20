@@ -1,2 +1,0 @@
-/usr/bin/ar qc libapp_helper.a CMakeFiles/app_helper.dir/helpers/Responsehelper.cpp.o
-/usr/bin/ranlib libapp_helper.a
