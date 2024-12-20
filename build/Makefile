@@ -117,6 +117,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named connection_manager
+
+# Build rule for target.
+connection_manager: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 connection_manager
+.PHONY : connection_manager
+
+# fast build rule for target.
+connection_manager/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/connection_manager.dir/build.make CMakeFiles/connection_manager.dir/build
+.PHONY : connection_manager/fast
+
+#=============================================================================
 # Target rules for targets named login_repo
 
 # Build rule for target.
@@ -141,6 +154,19 @@ app_helper: cmake_check_build_system
 app_helper/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/app_helper.dir/build.make CMakeFiles/app_helper.dir/build
 .PHONY : app_helper/fast
+
+#=============================================================================
+# Target rules for targets named login_service
+
+# Build rule for target.
+login_service: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 login_service
+.PHONY : login_service
+
+# fast build rule for target.
+login_service/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_service.dir/build.make CMakeFiles/login_service.dir/build
+.PHONY : login_service/fast
 
 #=============================================================================
 # Target rules for targets named terminet
@@ -178,6 +204,30 @@ db/login/login_repository.s: db/login/login_repository.cpp.s
 db/login/login_repository.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_repo.dir/build.make CMakeFiles/login_repo.dir/db/login/login_repository.cpp.s
 .PHONY : db/login/login_repository.cpp.s
+
+db/manager/connection_manager.o: db/manager/connection_manager.cpp.o
+.PHONY : db/manager/connection_manager.o
+
+# target to build an object file
+db/manager/connection_manager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/connection_manager.dir/build.make CMakeFiles/connection_manager.dir/db/manager/connection_manager.cpp.o
+.PHONY : db/manager/connection_manager.cpp.o
+
+db/manager/connection_manager.i: db/manager/connection_manager.cpp.i
+.PHONY : db/manager/connection_manager.i
+
+# target to preprocess a source file
+db/manager/connection_manager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/connection_manager.dir/build.make CMakeFiles/connection_manager.dir/db/manager/connection_manager.cpp.i
+.PHONY : db/manager/connection_manager.cpp.i
+
+db/manager/connection_manager.s: db/manager/connection_manager.cpp.s
+.PHONY : db/manager/connection_manager.s
+
+# target to generate assembly for a file
+db/manager/connection_manager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/connection_manager.dir/build.make CMakeFiles/connection_manager.dir/db/manager/connection_manager.cpp.s
+.PHONY : db/manager/connection_manager.cpp.s
 
 helpers/Responsehelper.o: helpers/Responsehelper.cpp.o
 .PHONY : helpers/Responsehelper.o
@@ -227,6 +277,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/terminet.dir/build.make CMakeFiles/terminet.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+services/login/login.o: services/login/login.cpp.o
+.PHONY : services/login/login.o
+
+# target to build an object file
+services/login/login.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_service.dir/build.make CMakeFiles/login_service.dir/services/login/login.cpp.o
+.PHONY : services/login/login.cpp.o
+
+services/login/login.i: services/login/login.cpp.i
+.PHONY : services/login/login.i
+
+# target to preprocess a source file
+services/login/login.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_service.dir/build.make CMakeFiles/login_service.dir/services/login/login.cpp.i
+.PHONY : services/login/login.cpp.i
+
+services/login/login.s: services/login/login.cpp.s
+.PHONY : services/login/login.s
+
+# target to generate assembly for a file
+services/login/login.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_service.dir/build.make CMakeFiles/login_service.dir/services/login/login.cpp.s
+.PHONY : services/login/login.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -236,17 +310,25 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... app_helper"
+	@echo "... connection_manager"
 	@echo "... login_repo"
+	@echo "... login_service"
 	@echo "... terminet"
 	@echo "... db/login/login_repository.o"
 	@echo "... db/login/login_repository.i"
 	@echo "... db/login/login_repository.s"
+	@echo "... db/manager/connection_manager.o"
+	@echo "... db/manager/connection_manager.i"
+	@echo "... db/manager/connection_manager.s"
 	@echo "... helpers/Responsehelper.o"
 	@echo "... helpers/Responsehelper.i"
 	@echo "... helpers/Responsehelper.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... services/login/login.o"
+	@echo "... services/login/login.i"
+	@echo "... services/login/login.s"
 .PHONY : help
 
 

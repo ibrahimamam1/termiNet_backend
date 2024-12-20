@@ -248,11 +248,17 @@ PostgreSQL_LIBRARY_RELEASE:FILEPATH=/usr/lib/libpq.so
 // /usr/local/include/PostgreSQL/8.4 or C:/Program Files/PostgreSQL/8.4/include
 PostgreSQL_TYPE_INCLUDE_DIR:PATH=/usr/include/postgresql/server
 
+//Dependencies for the target
+connection_manager_LIB_DEPENDS:STATIC=general;pqxx;
+
 //The directory containing a CMake configuration file for crow.
 crow_DIR:PATH=crow_DIR-NOTFOUND
 
 //Dependencies for the target
-login_repo_LIB_DEPENDS:STATIC=general;pqxx;
+login_repo_LIB_DEPENDS:STATIC=general;connection_manager;
+
+//Dependencies for the target
+login_service_LIB_DEPENDS:STATIC=general;login_repo;
 
 //Value Computed by CMake
 terminet_BINARY_DIR:STATIC=/home/rgb/Desktop/projects/terminet_backend/build

@@ -58,7 +58,9 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/connection_manager.dir/DependInfo.cmake"
   "CMakeFiles/login_repo.dir/DependInfo.cmake"
   "CMakeFiles/app_helper.dir/DependInfo.cmake"
+  "CMakeFiles/login_service.dir/DependInfo.cmake"
   "CMakeFiles/terminet.dir/DependInfo.cmake"
   )

@@ -3,8 +3,9 @@
 
 CMakeFiles/terminet.dir/main.cpp.o
  /home/rgb/Desktop/projects/terminet_backend/main.cpp
- /home/rgb/Desktop/projects/terminet_backend/db/login/login_repository.h
- /home/rgb/Desktop/projects/terminet_backend/helper/AppHelper.h
+ /home/rgb/Desktop/projects/terminet_backend/db/manager/connection_manager.h
+ /home/rgb/Desktop/projects/terminet_backend/helpers/ResponseHelper.h
+ /home/rgb/Desktop/projects/terminet_backend/services/login/login.h
  /usr/include/alloca.h
  /usr/include/arpa/inet.h
  /usr/include/asm-generic/bitsperlong.h
@@ -1403,6 +1404,7 @@ CMakeFiles/terminet.dir/main.cpp.o
  /usr/include/c++/14.2.1/bits/stl_multimap.h
  /usr/include/c++/14.2.1/bits/stl_numeric.h
  /usr/include/c++/14.2.1/bits/stl_pair.h
+ /usr/include/c++/14.2.1/bits/stl_queue.h
  /usr/include/c++/14.2.1/bits/stl_raw_storage_iter.h
  /usr/include/c++/14.2.1/bits/stl_relops.h
  /usr/include/c++/14.2.1/bits/stl_tempbuf.h
@@ -1426,6 +1428,7 @@ CMakeFiles/terminet.dir/main.cpp.o
  /usr/include/c++/14.2.1/bits/utility.h
  /usr/include/c++/14.2.1/bits/vector.tcc
  /usr/include/c++/14.2.1/bits/version.h
+ /usr/include/c++/14.2.1/bitset
  /usr/include/c++/14.2.1/cassert
  /usr/include/c++/14.2.1/cctype
  /usr/include/c++/14.2.1/cerrno
@@ -1490,6 +1493,7 @@ CMakeFiles/terminet.dir/main.cpp.o
  /usr/include/c++/14.2.1/pstl/glue_memory_defs.h
  /usr/include/c++/14.2.1/pstl/glue_numeric_defs.h
  /usr/include/c++/14.2.1/pstl/pstl_config.h
+ /usr/include/c++/14.2.1/queue
  /usr/include/c++/14.2.1/ranges
  /usr/include/c++/14.2.1/ratio
  /usr/include/c++/14.2.1/semaphore

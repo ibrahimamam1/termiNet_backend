@@ -1,19 +1,21 @@
 #include "login_repository.h"
-#include <pqxx/pqxx>
+#include "../manager/connection_manager.h"
+#include <memory>
+
 
 bool LoginRepository::login(const std::string &emailHash,
                             const std::string &passwordHash,
                             std::string &message, int &error_code) {
   try {
-    pqxx::connection conn("dbname=terminet user=rgb password=");
-    if (!conn.is_open()) {
+    std::unique_ptr<pqxx::connection> conn = ConnectionManager::getInstance()->getConnection();
+    if (!conn->is_open()) {
       message = "Failed to Connect to Database";
       error_code = 1;
       return false;
     }
 
-    pqxx::work tx(conn);
-    conn.prepare("login_check" ,"SELECT login_check($1, $2)");
+    pqxx::work tx(*conn);
+    conn->prepare("login_check" ,"SELECT login_check($1, $2)");
     pqxx::result r{tx.exec_prepared("login_check", emailHash, passwordHash)};
 
     if (r.empty()) {

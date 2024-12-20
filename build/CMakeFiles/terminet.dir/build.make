@@ -96,8 +96,12 @@ terminet_EXTERNAL_OBJECTS =
 terminet: CMakeFiles/terminet.dir/main.cpp.o
 terminet: CMakeFiles/terminet.dir/build.make
 terminet: CMakeFiles/terminet.dir/compiler_depend.ts
+terminet: libconnection_manager.a
 terminet: liblogin_repo.a
+terminet: liblogin_service.a
 terminet: libapp_helper.a
+terminet: liblogin_repo.a
+terminet: libconnection_manager.a
 terminet: CMakeFiles/terminet.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/rgb/Desktop/projects/terminet_backend/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable terminet"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/terminet.dir/link.txt --verbose=$(VERBOSE)
