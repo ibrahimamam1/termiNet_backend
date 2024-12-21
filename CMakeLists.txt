@@ -9,7 +9,7 @@ if(NOT PostgreSQL_FOUND)
     message(FATAL_ERROR "PostgreSQL development files are required to compile this project")
 endif()
 
-# Source files for the app helper
+# Source files for the app helpers
 file(GLOB APP_HELPER_SOURCES "helpers/*.cpp")
 add_library(app_helper STATIC ${APP_HELPER_SOURCES})
 

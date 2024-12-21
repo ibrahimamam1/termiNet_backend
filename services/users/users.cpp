@@ -2,7 +2,12 @@
 #include "../../db/users/user_repository.h"
 #include "../../helpers/ResponseHelper.h"
 #include <crow/json.h>
+#include <string>
 
+/*
+*Takes the email send of the user and return json data will the information stored on the user
+*If email is not found in database return 404 user not found 
+*/
 crow::json::wvalue UserService::getUserWithEmail(std::string& email) {
     crow::json::wvalue userData;
     int err = 0;
@@ -21,5 +26,25 @@ crow::json::wvalue UserService::getUserWithEmail(std::string& email) {
     }
     
     return userData;
+}
+
+crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
+  std::string name = jsonData["user_name"].s();
+  std::string email = jsonData["user_email"].s();
+  std::string sex = jsonData["user_sex"].s();
+  std::string dob = jsonData["user_dob"].s();
+  std::string bio = jsonData["user_bio"].s();
+  std::string pass = jsonData["password"].s();
+  std::string created_at = jsonData["created_at"].s();
+
+  int err = -1;
+  std::string message;
+
+  UserRepository::addNewUser(name, email, sex, dob, bio, pass, created_at, err, message);
+
+  crow::json::wvalue returnData;
+  returnData = ResponseHelper::make_response(err);
+  returnData["message"] = message;
+  return returnData;
 }
 

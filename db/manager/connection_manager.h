@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#define MAX_CONNECTION 100
+#define MAX_CONNECTION 10
 
 class ConnectionManager {
 private:
