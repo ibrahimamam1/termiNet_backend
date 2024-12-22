@@ -2,6 +2,7 @@
 #include "../../db/users/user_repository.h"
 #include "../../helpers/ResponseHelper.h"
 #include <crow/json.h>
+#include <iostream>
 #include <string>
 
 /*
@@ -11,8 +12,9 @@
 crow::json::wvalue UserService::getUserWithEmail(std::string& email) {
     crow::json::wvalue userData;
     int err = 0;
-    pqxx::result res = UserRepository::getUserWithEmail(email, err);
-    userData = ResponseHelper::make_response(err);
+    std::string error_msg = "";
+    pqxx::result res = UserRepository::getUserWithEmail(email, err, error_msg);
+    userData = ResponseHelper::make_response(err, error_msg);
     
     if (err == 200){
         const pqxx::row& row = res[0];  // Get the first (and only) row
@@ -43,8 +45,8 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
   UserRepository::addNewUser(name, email, sex, dob, bio, pass, created_at, err, message);
 
   crow::json::wvalue returnData;
-  returnData = ResponseHelper::make_response(err);
-  returnData["message"] = message;
+  returnData = ResponseHelper::make_response(err, message);
+  std::cout << message << std::endl;
   return returnData;
 }
 

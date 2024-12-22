@@ -16,9 +16,9 @@ crow::json::wvalue LoginService::check_login(std::string& emailHash, std::string
       if(error_code) std::cerr << error_message;
     }while(error_code >= 500 && retries > 0);
     
-  crow::json::wvalue jsonData = ResponseHelper::make_response(error_code);
+  crow::json::wvalue jsonData = ResponseHelper::make_response(error_code, error_message);
   if(error_code == 200){
-    jsonData["body"]["grant_access"] = login_result[0][0].as<bool>();
+    jsonData["body"]["Grant Access"] = login_result[0][0].as<bool>();
   }
 
   return jsonData;
