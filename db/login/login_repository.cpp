@@ -26,7 +26,7 @@ pqxx::result LoginRepository::login(const std::string &emailHash,
       return r;
     }
 
-    message = "Login successful";
+    message = "No Error";
     error_code = 200;
     
     ConnectionManager::getInstance()->releaseConnection(conn_index);

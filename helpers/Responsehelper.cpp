@@ -1,7 +1,7 @@
 #include "ResponseHelper.h"
 #include <crow/json.h>
 
-crow::json::wvalue ResponseHelper::make_response(int statusCode) {
+crow::json::wvalue ResponseHelper::make_response(int statusCode, std::string message) {
   crow::json::wvalue response;
   response["StatusCode"] = statusCode;
 
@@ -55,20 +55,8 @@ crow::json::wvalue ResponseHelper::make_response(int statusCode) {
   else
     response["Status"] = "Unknown Status Code";
 
+  response["Message"] = message;
   return response;
 }
 
-crow::json::wvalue &ResponseHelper::add_data(crow::json::wvalue &response,
-                                             const std::string &key,
-                                             const crow::json::rvalue &value) {
-  response[key] = value;
-  return response;
-}
 
-crow::json::wvalue &ResponseHelper::add_error(crow::json::wvalue &response,
-                                              const std::string &message,
-                                              const std::string &details) {
-  response["Error"]["Message"] = message;
-  response["Error"]["Details"] = details;
-  return response;
-}
