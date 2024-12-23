@@ -9,11 +9,11 @@
 *Takes the email send of the user and return json data will the information stored on the user
 *If email is not found in database return 404 user not found 
 */
-crow::json::wvalue UserService::getUserWithEmail(std::string& email) {
+crow::json::wvalue UserService::getUser(const std::string& field, const std::string value) {
     crow::json::wvalue userData;
     int err = 0;
     std::string error_msg = "";
-    pqxx::result res = UserRepository::getUserWithEmail(email, err, error_msg);
+    pqxx::result res = UserRepository::getUser(field, value, err, error_msg);
     userData = ResponseHelper::make_response(err, error_msg);
     
     if (err == 200){
@@ -28,6 +28,14 @@ crow::json::wvalue UserService::getUserWithEmail(std::string& email) {
     }
     
     return userData;
+}
+
+crow::json::wvalue UserService::getUserWithEmail(const std::string& email) {
+  return getUser("user_email", email);
+}
+
+crow::json::wvalue UserService::getUserWithName(const std::string& name) {
+  return getUser("user_name", name);
 }
 
 crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){

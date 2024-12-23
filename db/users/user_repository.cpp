@@ -4,7 +4,7 @@
 #include <string>
 
 
-pqxx::result UserRepository::getUserWithEmail(std::string& email, int& error_code, std::string& error_msg){
+pqxx::result UserRepository::getUser(const std::string& field, const std::string& value, int& error_code, std::string& error_msg){
   int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
   
   std::unique_ptr<pqxx::connection>conn = ConnectionManager::getInstance()->getConnection(conn_index);
@@ -15,8 +15,8 @@ pqxx::result UserRepository::getUserWithEmail(std::string& email, int& error_cod
   }
   pqxx::work tx{*conn};
 
-  conn->prepare("get_user","select * from users where user_email=$1");
-  pqxx::result res{tx.exec_prepared("get_user", email)};
+  conn->prepare("get_user","select * from users where " + field + "= $1");
+  pqxx::result res{tx.exec_prepared("get_user", value)};
 
   if(res.empty()){
     error_code = 404;
