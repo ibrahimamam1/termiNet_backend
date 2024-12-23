@@ -1,17 +1,23 @@
 #include <crow.h>
 #include <crow/app.h>
 #include <crow/json.h>
+#include <crow/websocket.h>
 #include <csignal>
 #include <exception>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include "services/login/login.h"
 #include "services/users/users.h"
 #include "helpers/ResponseHelper.h"
 #include "db/manager/connection_manager.h"
 
 #define CROW_MAIN
+
+using webSocketPtr = std::shared_ptr<crow::websocket::connection>;
+std::unordered_map<int, webSocketPtr> user_connections;
 
 int main(){
   crow::SimpleApp app;
@@ -41,8 +47,13 @@ int main(){
   });
 
   //handle getting a user information
-  CROW_ROUTE(app, "/users/<string>")([](std::string email){
-    crow::json::wvalue response = UserService::getUserWithEmail(email);
+  CROW_ROUTE(app, "/users/<int>/<string>")([](int code, std::string id){
+    crow::json::wvalue response;;
+    
+    if(code == 1)
+      response = UserService::getUserWithEmail(id);
+    else if(code == 2)
+      response = UserService::getUserWithName(id);
     return response;
   });
   
@@ -64,6 +75,20 @@ int main(){
     }
       return response;
   });
+  
+  //messaging web socket
+  CROW_ROUTE(app, "/chat/").websocket().onopen([&](crow::websocket::connection& conn){
+    std::cout << "Received Web Socket Connection Request\n";
+  })
+  .onclose([&](crow::websocket::connection& conn, std::string reason){
+      
+    })
+  .onmessage([&](crow::websocket::connection& conn, const std::string& data, bool is_binary){
+
+    }); 
+
+
+
 
   app.port(8080).multithreaded().run();
 }
