@@ -54,7 +54,10 @@ int main(){
       response = UserService::getUserWithEmail(id);
     else if(code == 2)
       response = UserService::getUserWithName(id);
-    return response;
+    else if(code == 3)
+      response = UserService::getUserWithUserId(id);
+    
+   return response;
   });
   
   //handle adding new user
