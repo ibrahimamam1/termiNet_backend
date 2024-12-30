@@ -76,7 +76,8 @@ int main() {
         std::cout << "Received Web Socket Connection Request " << std::endl;
       })
       .onclose([&](crow::websocket::connection &conn, std::string reason) {
-
+        std::cout << reason << std::endl;
+        RoutingService::removeConnection(&conn);
       })
       .onmessage([&](crow::websocket::connection &conn, const std::string &data,
                      bool is_binary) {
