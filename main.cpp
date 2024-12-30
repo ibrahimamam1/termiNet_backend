@@ -89,8 +89,9 @@ int main() {
           RoutingService::addConnection(key, conn_ptr);
         } else {
           int dest = message["destination"].i();
+          int src = message["source"].i();
           std::string msg = message["content"].s();
-          RoutingService::routeMessage(dest, msg);
+          RoutingService::routeMessage(src, dest, msg);
         }
       });
 

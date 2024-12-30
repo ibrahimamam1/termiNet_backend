@@ -13,13 +13,19 @@ void RoutingService::addConnection(const int &key, std::shared_ptr<crow::websock
   std::cout << "Added new connection for user " << key << std::endl;
 }
 
-void RoutingService::routeMessage(const int &dest, const std::string &data) {
+void RoutingService::routeMessage(const int& src, const int &dest, const std::string &data) {
   std::unique_lock<std::mutex> lock(connection_mutex);
   auto it = connections.find(dest);
 
   if (it != connections.end()) {
     try {
-      it->second->send_text(data);
+      crow::json::wvalue payload;
+      payload["sender_id"] = src;
+      payload["message"] = data;
+      
+      std::string str = payload.dump();
+      it->second->send_text(str);
+      
       std::cout << "Sent data to user " << dest << std::endl;
     } catch (std::exception &e) {
       std::cout << "Failed to send data to user " << dest << " " << e.what()
