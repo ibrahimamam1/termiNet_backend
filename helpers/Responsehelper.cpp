@@ -1,5 +1,4 @@
 #include "ResponseHelper.h"
-#include <crow/json.h>
 
 crow::json::wvalue ResponseHelper::make_response(int statusCode, std::string message) {
   crow::json::wvalue response;

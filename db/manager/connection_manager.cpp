@@ -1,10 +1,15 @@
 #include "connection_manager.h"
 #include <iostream>
 #include <memory>
+#include <strings.h>
 
 ConnectionManager *ConnectionManager::instance = nullptr;
+std::mutex ConnectionManager::instance_mutex;
 
-ConnectionManager::~ConnectionManager() {}
+ConnectionManager::~ConnectionManager() {
+  std::cout << "Closing all Connections\n";
+  closeConnections();
+}
 
 bool ConnectionManager::init(std::string connectionString) {
 
@@ -34,8 +39,11 @@ int ConnectionManager::getConnectionIndex() {
   return index;
 }
 
-std::unique_ptr<pqxx::connection> ConnectionManager::getConnection(int index){
-  return std::move(connection_pool[index]);
+pqxx::connection& ConnectionManager::getConnection(int index){
+  if(index < 0 || index > MAX_CONNECTION){
+     throw std::out_of_range("Invalid connection index: " + std::to_string(index));
+  }
+  return *connection_pool[index];
 }
 
 void ConnectionManager::releaseConnection(int index) {
@@ -48,12 +56,23 @@ void ConnectionManager::releaseConnection(int index) {
 }
 
 ConnectionManager *ConnectionManager::getInstance() {
-  if (instance == nullptr)
-    instance = new ConnectionManager();
+  if (instance == nullptr) {
+    std::lock_guard<std::mutex> lock(instance_mutex);
+    if (instance == nullptr) {
+      instance = new ConnectionManager();
+    }
+  }
   return instance;
 }
-void ConnectionManager::closeConnections(){
-  for(int i=0; i<MAX_CONNECTION; i++){
-    connection_pool[i]->close();
+
+void ConnectionManager::closeConnections() {
+  for (auto& conn : connection_pool) {
+    if (conn && conn->is_open()) {
+      try {
+        conn->close();
+      } catch (const std::exception& e) {
+        std::cerr << "Error closing database connection: " << e.what() << std::endl;
+      }
+    }
   }
 }

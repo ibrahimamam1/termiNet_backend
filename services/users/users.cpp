@@ -1,7 +1,6 @@
 #include "users.h"
 #include "../../db/users/user_repository.h"
 #include "../../helpers/ResponseHelper.h"
-#include <crow/json.h>
 #include <iostream>
 #include <string>
 
@@ -38,6 +37,9 @@ crow::json::wvalue UserService::getUserWithName(const std::string& name) {
   return getUser("user_name", name);
 }
 
+crow::json::wvalue UserService::getUserWithUserId(const std::string& userId){
+  return getUser("user_id", userId);
+}
 crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
   std::string name = jsonData["user_name"].s();
   std::string email = jsonData["user_email"].s();
