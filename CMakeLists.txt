@@ -39,6 +39,11 @@ file(GLOB USER_SERVICE_SOURCES "services/users/*.cpp")
 add_library(user_service STATIC ${USER_SERVICE_SOURCES})
 target_link_libraries(user_service PRIVATE user_repo app_helper)
 
+# source files for routing service
+file(GLOB ROUTING_SERVICE_SOURCES "services/routing/*.cpp")
+add_library(routing_service STATIC ${ROUTING_SERVICE_SOURCES})
+target_link_libraries(routing_service PRIVATE app_helper)
+
 
 
 # Source files for the main executable
@@ -49,4 +54,5 @@ target_link_libraries(
   pqxx
   login_service
   user_service
+  routing_service
 )
