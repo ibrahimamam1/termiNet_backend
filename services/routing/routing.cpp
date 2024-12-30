@@ -35,3 +35,17 @@ void RoutingService::routeMessage(const int& src, const int &dest, const std::st
     std::cout << "User has no Connection\n";
   }
 }
+
+void RoutingService::removeConnection(crow::websocket::connection* conn) {
+    std::unique_lock<std::mutex> lock(connection_mutex);
+    
+    // Find and remove the connection that matches the pointer
+    for (auto it = connections.begin(); it != connections.end(); ) {
+        if (it->second.get() == conn) {
+            std::cout << "Removing connection for user " << it->first << std::endl;
+            it = connections.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
