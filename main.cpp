@@ -88,6 +88,7 @@ int main() {
           auto conn_ptr = std::shared_ptr<crow::websocket::connection>(
               &conn, [](auto *) {});
           RoutingService::addConnection(key, conn_ptr);
+          RoutingService::sendUndeliveredMessages(key);
         } else {
           int dest = message["destination"].i();
           int src = message["source"].i();

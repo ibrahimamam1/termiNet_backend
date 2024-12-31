@@ -1,7 +1,9 @@
 #include "routing.h"
+#include "../../db/message/message_repository.h"
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <string>
 
 std::unordered_map<int, std::shared_ptr<crow::websocket::connection>> RoutingService::connections;
 std::mutex RoutingService::connection_mutex;
@@ -14,6 +16,10 @@ void RoutingService::addConnection(const int &key, std::shared_ptr<crow::websock
 }
 
 void RoutingService::routeMessage(const int& src, const int &dest, const std::string &data) {
+  int err = -1;
+  std::string err_msg = "";
+  
+  std::cout << "Routing Message to User "<<dest;
   std::unique_lock<std::mutex> lock(connection_mutex);
   auto it = connections.find(dest);
 
@@ -30,12 +36,28 @@ void RoutingService::routeMessage(const int& src, const int &dest, const std::st
     } catch (std::exception &e) {
       std::cout << "Failed to send data to user " << dest << " " << e.what()
                 << std::endl;
+
+        MessageRepository::addNewUndelivered(src, dest, data, err, err_msg);
     }
   } else {
-    std::cout << "User has no Connection\n";
+    std::cout << "User " << dest << " has no Connection. Saving Message from" << src << "\n";
+
+        MessageRepository::addNewUndelivered(src, dest, data, err, err_msg);
   }
 }
 
+void RoutingService::sendUndeliveredMessages(const int& key){
+  int err_code = -1;
+  std::string err_msg;
+  pqxx::result res = MessageRepository::getAllUndelivered(key, err_code, err_msg);
+
+  for(const auto& row : res){
+    std::cout << "Retransmission of undeliverd to: " << row[2].as<int>() << " from: "<<row[1].as<int>() << "\n";
+    routeMessage(row[1].as<int>(), row[2].as<int>(), row[4].as<std::string>());
+    MessageRepository::removeMessage(row[0].as<int>(), err_code, err_msg);
+    
+  }
+}
 void RoutingService::removeConnection(crow::websocket::connection* conn) {
     std::unique_lock<std::mutex> lock(connection_mutex);
     

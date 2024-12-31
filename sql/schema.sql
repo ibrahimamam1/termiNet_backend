@@ -8,3 +8,11 @@ create table if not exists users(
     passwd text,
     created_at date
 );
+
+create table if not exists undelivered_messages(
+  message_id serial primary key,
+  sender_id integer,
+  receiver_id integer,
+  sent_at date,
+  content text
+);

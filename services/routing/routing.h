@@ -10,4 +10,5 @@ class RoutingService{
   static void addConnection(const int &key, std::shared_ptr<crow::websocket::connection> conn);
   static void removeConnection(crow::websocket::connection* conn);
   static void routeMessage(const int& src, const int& dest, const std::string& data);
+  static void sendUndeliveredMessages(const int& key);
 };

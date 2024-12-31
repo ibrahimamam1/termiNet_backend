@@ -28,6 +28,10 @@ file(GLOB USER_REPO_SOURCES "db/users/*.cpp")
 add_library(user_repo STATIC ${USER_REPO_SOURCES})
 target_link_libraries(user_repo PRIVATE connection_manager)
 
+# Source files for the message repo
+file(GLOB MESSAGE_REPO_SOURCES "db/message/*.cpp")
+add_library(message_repo STATIC ${MESSAGE_REPO_SOURCES})
+target_link_libraries(message_repo PRIVATE connection_manager)
 
 # Source files for the login service
 file(GLOB LOGIN_SERVICE_SOURCES "services/login/*.cpp")
@@ -42,7 +46,7 @@ target_link_libraries(user_service PRIVATE user_repo app_helper)
 # source files for routing service
 file(GLOB ROUTING_SERVICE_SOURCES "services/routing/*.cpp")
 add_library(routing_service STATIC ${ROUTING_SERVICE_SOURCES})
-target_link_libraries(routing_service PRIVATE app_helper)
+target_link_libraries(routing_service PRIVATE message_repo app_helper)
 
 
 
