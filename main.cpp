@@ -70,6 +70,24 @@ int main() {
         return response;
       });
 
+  //updating user information
+  CROW_ROUTE(app, "/update/users/")([](const crow::request &req) {
+    crow::json::wvalue response;
+    try{
+      auto json_data = crow::json::load(req.body);
+      if(!json_data){
+        response = ResponseHelper::make_response(400, "Invalid Json");
+        return response;
+      }
+      response = UserService::updateUser(json_data["field"].s(), json_data["new_data"].s());
+
+    }catch(std::runtime_error e){
+      std::cerr << e.what();
+      response = ResponseHelper::make_response(500, e.what());
+      return response;
+    }
+  });
+
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")
       .onopen([&](crow::websocket::connection &conn) {

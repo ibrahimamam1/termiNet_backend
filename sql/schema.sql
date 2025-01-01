@@ -16,3 +16,9 @@ create table if not exists undelivered_messages(
   sent_at date,
   content text
 );
+
+create table if not exists profile_pics_bucket(
+  id serial primary key,
+  image bytea,
+  user_id integer references users(user_id)
+);
