@@ -31,12 +31,8 @@ crow::json::wvalue UserService::getUser(const std::string& field, const std::str
     // Get profile pic
         pqxx::result profile_pic = UserRepository::getUserProfilePic(user_id);
         if (!profile_pic.empty()) {
-            // Get binary data from BYTEA column
-            const uint8_t* binary_data = reinterpret_cast<const uint8_t*>(profile_pic[0]["image"].c_str());
-            size_t data_size = profile_pic[0]["image"].size();
+            std::string base64_image = profile_pic[0]["image"].c_str();
             
-            // Convert to Base64
-            std::string base64_image = crow::utility::base64encode(binary_data, data_size);
             
             // Add to response
             userData["body"]["profile_image"] = base64_image;
@@ -78,8 +74,8 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
 }
 
 //update user functions
-crow::json::wvalue UserService::updateUser(const std::string& field, const std::string new_value){
-  bool success = UserRepository::updateUser(field, new_value);
+crow::json::wvalue UserService::updateUser(const std::string& field, const std::string& new_value, const std::string& key){ 
+  bool success = UserRepository::updateUser(field, new_value, key);
   
   crow::json::wvalue returnData;
   if(success)

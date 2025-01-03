@@ -125,28 +125,45 @@ pqxx::result UserRepository::getUserProfilePic(const int& user_id){
   
 }
 
-static bool updateUser(const std::string& field, const std::string value){
-  int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
+bool UserRepository::updateUser(const std::string& field, const std::string& value, const std::string& key) {
+    int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
 
-  if(conn_index == -1){
-    std::cerr << "Update User: No Connection Available\n";
-    return false;
-  }
-
-  try{
-    pqxx::connection &conn = ConnectionManager::getInstance()->getConnection(conn_index);
-
-    if(!conn.is_open()){
-      std::cerr << "Update User Error: Connection is closed\n";
-      return false;
+    if (conn_index == -1) {
+        std::cerr << "Update User: No Connection Available\n";
+        return false;
     }
 
-    pqxx::work tx{conn};
-    if(field != "profile_image"){  
-      conn.prepare("Update users set $1 = $2 where user_id = $3");
+    try {
+        pqxx::connection &conn = ConnectionManager::getInstance()->getConnection(conn_index);
+
+        if (!conn.is_open()) {
+            std::cerr << "Update User Error: Connection is closed\n";
+            ConnectionManager::getInstance()->releaseConnection(conn_index);
+            return false;
+        }
+
+        pqxx::work tx{conn};
+
+        if (field != "profile_image") {
+            conn.prepare("update_user", "UPDATE users SET " + field + " = $1 WHERE user_id = $2");
+            tx.exec_prepared("update_user", value, key);
+        } else {
+            // Prepare and execute the update query for the profile image
+            conn.prepare("update_profile_image", "UPDATE profile_pics_bucket SET image = $1 WHERE user_id = $2");
+            tx.exec_prepared("update_profile_image", value, key);
+        }
+
+        // Commit the transaction
+        tx.commit();
+
+        // Release the connection
+        ConnectionManager::getInstance()->releaseConnection(conn_index);
+        return true;
+    } catch (const std::exception &e) {
+        std::cerr << "Update User Error: " << e.what() << "\n";
+
+        // Release the connection in case of an error
+        ConnectionManager::getInstance()->releaseConnection(conn_index);
+        return false;
     }
-  else{
-      conn.prepare("Update profile_pics_bucket set image = $1 where user_id = $2");
-    }
-  }
 }
