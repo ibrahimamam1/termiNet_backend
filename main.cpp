@@ -52,7 +52,7 @@ int main() {
 
   // handle adding new user
   CROW_ROUTE(app, "/users/")
-      .methods("POST"_method)([](const crow::request &req) {
+      .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
         try {
           std::cout << "Received body: " << req.body << std::endl;
@@ -69,6 +69,25 @@ int main() {
         }
         return response;
       });
+
+  //updating user information
+  CROW_ROUTE(app, "/update/users/")([](const crow::request &req) {
+    crow::json::wvalue response;
+    std::string key = req.get_header_value("id");
+    try{
+      auto json_data = crow::json::load(req.body);
+      if(!json_data){
+        response = ResponseHelper::make_response(400, "Invalid Json");
+        return response;
+      }
+      response = UserService::updateUser(json_data["field"].s(), json_data["new_data"].s(), key);
+      return response;
+    }catch(std::runtime_error e){
+      std::cerr << e.what();
+      response = ResponseHelper::make_response(500, e.what());
+      return response;
+    }
+  });
 
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")
@@ -88,6 +107,7 @@ int main() {
           auto conn_ptr = std::shared_ptr<crow::websocket::connection>(
               &conn, [](auto *) {});
           RoutingService::addConnection(key, conn_ptr);
+          RoutingService::sendUndeliveredMessages(key);
         } else {
           int dest = message["destination"].i();
           int src = message["source"].i();

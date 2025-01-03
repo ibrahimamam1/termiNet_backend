@@ -15,10 +15,12 @@ crow::json::wvalue UserService::getUser(const std::string& field, const std::str
     pqxx::result res = UserRepository::getUser(field, value, err, error_msg);
     userData = ResponseHelper::make_response(err, error_msg);
     
+    int user_id;
     if (err == 200){
         const pqxx::row& row = res[0];  // Get the first (and only) row
         
         userData["body"]["user_id"] = row["user_id"].as<int>();
+        user_id = row["user_id"].as<int>();
         userData["body"]["user_name"] = row["user_name"].as<std::string>();
         userData["body"]["user_email"] = row["user_email"].as<std::string>();
         userData["body"]["user_sex"] = row["user_sex"].as<std::string>();
@@ -26,6 +28,17 @@ crow::json::wvalue UserService::getUser(const std::string& field, const std::str
         userData["body"]["created_at"] = row["created_at"].as<std::string>();
     }
     
+    // Get profile pic
+        pqxx::result profile_pic = UserRepository::getUserProfilePic(user_id);
+        if (!profile_pic.empty()) {
+            std::string base64_image = profile_pic[0]["image"].c_str();
+            
+            
+            // Add to response
+            userData["body"]["profile_image"] = base64_image;
+        } else {
+            userData["body"]["profile_image"] = "";
+        }
     return userData;
 }
 
@@ -60,3 +73,15 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
   return returnData;
 }
 
+//update user functions
+crow::json::wvalue UserService::updateUser(const std::string& field, const std::string& new_value, const std::string& key){ 
+  bool success = UserRepository::updateUser(field, new_value, key);
+  
+  crow::json::wvalue returnData;
+  if(success)
+    returnData = ResponseHelper::make_response(200, "Data Updated Succesfully");
+  else 
+    returnData = ResponseHelper::make_response(500, "Internal Server Error");
+
+  return returnData;
+}

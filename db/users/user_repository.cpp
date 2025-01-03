@@ -2,6 +2,8 @@
 #include "../manager/connection_manager.h"
 #include <exception>
 #include <iostream>
+#include <memory>
+#include <pqxx/internal/statement_parameters.hxx>
 #include <string>
 
 pqxx::result UserRepository::getUser(const std::string &field,
@@ -91,4 +93,77 @@ void UserRepository::addNewUser(
   }
 
   ConnectionManager::getInstance()->releaseConnection(conn_index);
+}
+
+pqxx::result UserRepository::getUserProfilePic(const int& user_id){
+  int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
+
+  if(conn_index == -1)
+    return pqxx::result();
+
+  std::unique_ptr<pqxx::work>tx;
+  try{
+    pqxx::connection &conn = ConnectionManager::getInstance()->getConnection(conn_index);
+
+    if(!conn.is_open()){
+      return pqxx::result();
+    }
+
+    tx = std::make_unique<pqxx::work>(conn);
+
+    conn.prepare("get_profile_pic", "SELECT image from profile_pics_bucket where user_id = $1");
+    pqxx::result res {tx->exec_prepared("get_profile_pic", user_id)};
+    tx->commit();
+
+    ConnectionManager::getInstance()->releaseConnection(conn_index);
+    return res;
+  }catch(const std::exception& e){
+    std::cerr << "Unexpected Error : " << e.what() << std::endl;
+    ConnectionManager::getInstance()->releaseConnection(conn_index);
+    return pqxx::result();
+  }
+  
+}
+
+bool UserRepository::updateUser(const std::string& field, const std::string& value, const std::string& key) {
+    int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
+
+    if (conn_index == -1) {
+        std::cerr << "Update User: No Connection Available\n";
+        return false;
+    }
+
+    try {
+        pqxx::connection &conn = ConnectionManager::getInstance()->getConnection(conn_index);
+
+        if (!conn.is_open()) {
+            std::cerr << "Update User Error: Connection is closed\n";
+            ConnectionManager::getInstance()->releaseConnection(conn_index);
+            return false;
+        }
+
+        pqxx::work tx{conn};
+
+        if (field != "profile_image") {
+            conn.prepare("update_user", "UPDATE users SET " + field + " = $1 WHERE user_id = $2");
+            tx.exec_prepared("update_user", value, key);
+        } else {
+            // Prepare and execute the update query for the profile image
+            conn.prepare("update_profile_image", "UPDATE profile_pics_bucket SET image = $1 WHERE user_id = $2");
+            tx.exec_prepared("update_profile_image", value, key);
+        }
+
+        // Commit the transaction
+        tx.commit();
+
+        // Release the connection
+        ConnectionManager::getInstance()->releaseConnection(conn_index);
+        return true;
+    } catch (const std::exception &e) {
+        std::cerr << "Update User Error: " << e.what() << "\n";
+
+        // Release the connection in case of an error
+        ConnectionManager::getInstance()->releaseConnection(conn_index);
+        return false;
+    }
 }
