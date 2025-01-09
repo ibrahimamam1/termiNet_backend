@@ -34,6 +34,10 @@ int main() {
     return response;
   });
 
+ 
+
+
+
   // handle getting a user information
   CROW_ROUTE(app, "/users/<int>/<string>")
   ([](int code, std::string id) {
@@ -55,13 +59,14 @@ int main() {
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
         try {
-          std::cout << "Received body: " << req.body << std::endl;
+          std::cout << "Creating a new user:\n";
           auto json_data = crow::json::load(req.body);
           if (!json_data) {
+            std::cerr << "\tReceived Invalid Json\n";
             response = ResponseHelper::make_response(400, "Invalid Json");
             return response;
           }
-          std::cout << "Parsed JSON: " << json_data << std::endl;
+          std::cout << "\tjson parsed succesffully\n";
           response = UserService::createUser(json_data);
         } catch (std::runtime_error e) {
           std::cerr << e.what();
@@ -70,24 +75,26 @@ int main() {
         return response;
       });
 
-  //updating user information
-  CROW_ROUTE(app, "/update/users/")([](const crow::request &req) {
-    crow::json::wvalue response;
-    std::string key = req.get_header_value("id");
-    try{
-      auto json_data = crow::json::load(req.body);
-      if(!json_data){
-        response = ResponseHelper::make_response(400, "Invalid Json");
-        return response;
-      }
-      response = UserService::updateUser(json_data["field"].s(), json_data["new_data"].s(), key);
-      return response;
-    }catch(std::runtime_error e){
-      std::cerr << e.what();
-      response = ResponseHelper::make_response(500, e.what());
-      return response;
-    }
-  });
+  // updating user information
+  CROW_ROUTE(app, "/update/users/")
+      .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
+        crow::json::wvalue response;
+        std::string key = req.get_header_value("id");
+        try {
+          auto json_data = crow::json::load(req.body);
+          if (!json_data) {
+            response = ResponseHelper::make_response(400, "Invalid Json");
+            return response;
+          }
+          response = UserService::updateUser(json_data["field"].s(),
+                                             json_data["new_data"].s(), key);
+          return response;
+        } catch (std::runtime_error e) {
+          std::cerr << e.what();
+          response = ResponseHelper::make_response(500, e.what());
+          return response;
+        }
+      });
 
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")
