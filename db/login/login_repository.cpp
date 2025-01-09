@@ -1,6 +1,5 @@
 #include "login_repository.h"
 #include "../manager/connection_manager.h"
-#include <memory>
 
 pqxx::result LoginRepository::login(const std::string &emailHash,
                                     const std::string &passwordHash,
@@ -11,7 +10,7 @@ pqxx::result LoginRepository::login(const std::string &emailHash,
 
     if (conn_index == -1) {
       message = "No database connections available";
-      error_code = 503;
+      error_code = 500;
       return pqxx::result();
     }
 

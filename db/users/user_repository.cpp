@@ -30,13 +30,12 @@ pqxx::result UserRepository::getUser(const std::string &field,
     pqxx::result res{tx.exec_prepared("get_user", value)};
 
     if (res.empty()) {
-      error_code = 404;
       error_msg = "User Not Found\n";
     } else {
-      error_code = 200;
       error_msg = "No Error";
     }
-
+    
+    error_code = 200;
     ConnectionManager::getInstance()->releaseConnection(conn_index);
     return res;
 
@@ -52,6 +51,7 @@ void UserRepository::addNewUser(
     const std::string &dob, const std::string &bio, const std::string &password,
     const std::string &created_at, int &error_code, std::string &error_msg) {
 
+  std::cout<<"\t User repository Adding new User to db...\n";
   int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
 
   if (conn_index == -1) {

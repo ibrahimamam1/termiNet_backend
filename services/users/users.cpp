@@ -2,12 +2,26 @@
 #include "../../db/users/user_repository.h"
 #include "../../helpers/ResponseHelper.h"
 #include <iostream>
+#include <pqxx/internal/statement_parameters.hxx>
 #include <string>
 
-/*
-*Takes the email send of the user and return json data will the information stored on the user
-*If email is not found in database return 404 user not found 
-*/
+bool UserService::userNameTaken(const std::string& user_name) {
+    std::cout << "\tChecking if userName is taken\n";
+    int error_code = -1;
+    std::string error_msg = "";
+    pqxx::result res = UserRepository::getUser("user_name", user_name, error_code, error_msg);
+
+    return !res.empty();
+}
+
+bool UserService::emailAlreadyExist(const std::string& user_email) {
+    int error_code = -1;
+    std::string error_msg = "";
+    pqxx::result res = UserRepository::getUser("user_email", user_email, error_code, error_msg);
+
+    return !res.empty();
+}
+
 crow::json::wvalue UserService::getUser(const std::string& field, const std::string value) {
     crow::json::wvalue userData;
     int err = 0;
@@ -16,7 +30,7 @@ crow::json::wvalue UserService::getUser(const std::string& field, const std::str
     userData = ResponseHelper::make_response(err, error_msg);
     
     int user_id;
-    if (err == 200){
+    if (error_msg == "No error"){
         const pqxx::row& row = res[0];  // Get the first (and only) row
         
         userData["body"]["user_id"] = row["user_id"].as<int>();
@@ -26,7 +40,6 @@ crow::json::wvalue UserService::getUser(const std::string& field, const std::str
         userData["body"]["user_sex"] = row["user_sex"].as<std::string>();
         userData["body"]["user_bio"] = row["user_bio"].as<std::string>();
         userData["body"]["created_at"] = row["created_at"].as<std::string>();
-    }
     
     // Get profile pic
         pqxx::result profile_pic = UserRepository::getUserProfilePic(user_id);
@@ -39,6 +52,7 @@ crow::json::wvalue UserService::getUser(const std::string& field, const std::str
         } else {
             userData["body"]["profile_image"] = "";
         }
+  }
     return userData;
 }
 
@@ -53,7 +67,9 @@ crow::json::wvalue UserService::getUserWithName(const std::string& name) {
 crow::json::wvalue UserService::getUserWithUserId(const std::string& userId){
   return getUser("user_id", userId);
 }
+
 crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
+  std::cout << "\tUser Service Creating User...\n";
   std::string name = jsonData["user_name"].s();
   std::string email = jsonData["user_email"].s();
   std::string sex = jsonData["user_sex"].s();
@@ -61,12 +77,28 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
   std::string bio = jsonData["user_bio"].s();
   std::string pass = jsonData["password"].s();
   std::string created_at = jsonData["created_at"].s();
-
+  
+  std::cout << "\tExtracted user data from json\n";
   int err = -1;
   std::string message;
+  
+  if(userNameTaken(name)){
+    std::cout <<"\tUser Name Already taken. returning";
+    crow::json::wvalue returnData = ResponseHelper::make_response(200, "UserName Already Taken");
+    returnData["Status"] = "Failed";
+    return returnData;
+  }
+
+  if(emailAlreadyExist(email)){
+    std::cout <<"\tEmail Already Exists. returning\n";
+    crow::json::wvalue returnData = ResponseHelper::make_response(200, "EmailAlreadyExist");
+    returnData["Status"] = "Failed";
+    return returnData;
+  }
+
 
   UserRepository::addNewUser(name, email, sex, dob, bio, pass, created_at, err, message);
-
+  std::cout<<"\tUser Created Successfully. returning\n";
   crow::json::wvalue returnData;
   returnData = ResponseHelper::make_response(err, message);
   std::cout << message << std::endl;
