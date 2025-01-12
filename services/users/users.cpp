@@ -72,12 +72,13 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
   std::cout << "\tUser Service Creating User...\n";
   std::string name = jsonData["user_name"].s();
   std::string email = jsonData["user_email"].s();
-  std::string sex = jsonData["user_sex"].s();
   std::string dob = jsonData["user_dob"].s();
   std::string bio = jsonData["user_bio"].s();
   std::string pass = jsonData["password"].s();
   std::string created_at = jsonData["created_at"].s();
-  
+  std::string method = jsonData["method"].s();
+  int user_id;
+
   std::cout << "\tExtracted user data from json\n";
   int err = -1;
   std::string message;
@@ -88,16 +89,25 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
     returnData["Status"] = "Failed";
     return returnData;
   }
-
-  if(emailAlreadyExist(email)){
-    std::cout <<"\tEmail Already Exists. returning\n";
-    crow::json::wvalue returnData = ResponseHelper::make_response(200, "EmailAlreadyExist");
-    returnData["Status"] = "Failed";
-    return returnData;
+  
+  if(method == "Email"){
+    if(emailAlreadyExist(email)){
+      std::cout <<"\tEmail Already Exists. returning\n";
+      crow::json::wvalue returnData = ResponseHelper::make_response(200, "EmailAlreadyExist");
+      returnData["Status"] = "Failed";
+      return returnData;
+    }
+    
+    //generate unique id
+    int idSequence = UserRepository::getNextUserIdSequenceValue();
+    user_id = time(NULL) + idSequence;
+  }
+  else if(method == "Google"){
+    user_id = jsonData["user_id"].i(); 
   }
 
 
-  UserRepository::addNewUser(name, email, sex, dob, bio, pass, created_at, err, message);
+  UserRepository::addNewUser(user_id, name, email, dob, bio, pass, created_at, err, message);
   std::cout<<"\tUser Created Successfully. returning\n";
   crow::json::wvalue returnData;
   returnData = ResponseHelper::make_response(err, message);
