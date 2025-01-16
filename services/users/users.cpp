@@ -29,15 +29,14 @@ crow::json::wvalue UserService::getUser(const std::string& field, const std::str
     pqxx::result res = UserRepository::getUser(field, value, err, error_msg);
     userData = ResponseHelper::make_response(err, error_msg);
     
-    int user_id;
-    if (error_msg == "No error"){
+    std::string user_id;
+    if (error_msg == "No Error"){
         const pqxx::row& row = res[0];  // Get the first (and only) row
         
-        userData["body"]["user_id"] = row["user_id"].as<int>();
-        user_id = row["user_id"].as<int>();
+        userData["body"]["user_id"] = row["user_id"].as<std::string>();
+        user_id = row["user_id"].as<std::string>();
         userData["body"]["user_name"] = row["user_name"].as<std::string>();
         userData["body"]["user_email"] = row["user_email"].as<std::string>();
-        userData["body"]["user_sex"] = row["user_sex"].as<std::string>();
         userData["body"]["user_bio"] = row["user_bio"].as<std::string>();
         userData["body"]["created_at"] = row["created_at"].as<std::string>();
     
@@ -77,7 +76,7 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
   std::string pass = jsonData["password"].s();
   std::string created_at = jsonData["created_at"].s();
   std::string method = jsonData["method"].s();
-  int user_id;
+  std::string user_id;
 
   std::cout << "\tExtracted user data from json\n";
   int err = -1;
@@ -100,10 +99,11 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
     
     //generate unique id
     int idSequence = UserRepository::getNextUserIdSequenceValue();
-    user_id = time(NULL) + idSequence;
+    int unique_id = time(NULL) + idSequence;
+    user_id = std::to_string(unique_id);
   }
   else if(method == "Google"){
-    user_id = jsonData["user_id"].i(); 
+    user_id = jsonData["user_id"].s(); 
   }
 
 

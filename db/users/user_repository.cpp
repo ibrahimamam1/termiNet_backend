@@ -47,7 +47,7 @@ pqxx::result UserRepository::getUser(const std::string &field,
 }
 
 void UserRepository::addNewUser(
-    const int& user_id, const std::string &name, const std::string &email,
+    const std::string& user_id, const std::string &name, const std::string &email,
     const std::string &dob, const std::string &bio, const std::string &password,
     const std::string &created_at, int &error_code, std::string &error_msg) {
 
@@ -97,7 +97,7 @@ void UserRepository::addNewUser(
   ConnectionManager::getInstance()->releaseConnection(conn_index);
 }
 
-pqxx::result UserRepository::getUserProfilePic(const int& user_id){
+pqxx::result UserRepository::getUserProfilePic(const std::string& user_id){
   int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
 
   if(conn_index == -1)
