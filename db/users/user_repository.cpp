@@ -47,7 +47,7 @@ pqxx::result UserRepository::getUser(const std::string &field,
 }
 
 void UserRepository::addNewUser(
-    const std::string &name, const std::string &email, const std::string &sex,
+    const std::string& user_id, const std::string &name, const std::string &email,
     const std::string &dob, const std::string &bio, const std::string &password,
     const std::string &created_at, int &error_code, std::string &error_msg) {
 
@@ -72,14 +72,16 @@ void UserRepository::addNewUser(
       return;
     }
 
-    tx = std::make_unique<pqxx::work>(conn); 
+    tx = std::make_unique<pqxx::work>(conn);
 
+       
     conn.prepare(
         "add_user",
-        "INSERT INTO users (user_name, user_email, user_sex, user_dob, "
+        "INSERT INTO users (user_id, user_name, user_email, user_dob, "
         "user_bio, passwd, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)");
+
     
-    tx->exec_prepared("add_user", name, email, sex, dob, bio, password,
+    tx->exec_prepared("add_user",user_id, name, email, dob, bio, password,
                      created_at);
     tx->commit();
     error_code = 201;
@@ -95,7 +97,7 @@ void UserRepository::addNewUser(
   ConnectionManager::getInstance()->releaseConnection(conn_index);
 }
 
-pqxx::result UserRepository::getUserProfilePic(const int& user_id){
+pqxx::result UserRepository::getUserProfilePic(const std::string& user_id){
   int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
 
   if(conn_index == -1)
@@ -166,4 +168,33 @@ bool UserRepository::updateUser(const std::string& field, const std::string& val
         ConnectionManager::getInstance()->releaseConnection(conn_index);
         return false;
     }
+}
+
+
+int UserRepository::getNextUserIdSequenceValue(){
+   int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
+
+  if(conn_index == -1)
+    return 111;
+
+  std::unique_ptr<pqxx::work>tx;
+  try{
+    pqxx::connection &conn = ConnectionManager::getInstance()->getConnection(conn_index);
+
+    if(!conn.is_open()){
+      return 111;
+    }
+
+    tx = std::make_unique<pqxx::work>(conn);
+    pqxx::result res {tx->exec("SELECT NEXTVAL('IDSEQ')")};
+    tx->commit();
+
+    ConnectionManager::getInstance()->releaseConnection(conn_index);
+    return res[0][0].as<int>();
+  }catch(const std::exception& e){
+    std::cerr << "Unexpected Error : " << e.what() << std::endl;
+    ConnectionManager::getInstance()->releaseConnection(conn_index);
+    return 111;
+  }
+  
 }

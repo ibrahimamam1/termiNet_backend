@@ -42,7 +42,6 @@ int main() {
   CROW_ROUTE(app, "/users/<int>/<string>")
   ([](int code, std::string id) {
     crow::json::wvalue response;
-    ;
 
     if (code == 1)
       response = UserService::getUserWithEmail(id);
