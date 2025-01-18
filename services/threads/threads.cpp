@@ -9,10 +9,9 @@ crow::json::wvalue ThreadService::addNewThread(const crow::json::rvalue& jsonDat
   std::string author_id = jsonData["author_id"].s();
   int community_id = jsonData["community_id"].i();
   int parentThreadId = jsonData["parent_thread_id"].i();
-  std::string createdAt = jsonData["created_at"].s();
 
   std::string errorMsg = "";
-  int err = ThreadRepository::addNewThread(title, content, createdAt, author_id, community_id, parentThreadId, errorMsg);
+  int err = ThreadRepository::addNewThread(title, content, author_id, community_id, parentThreadId, errorMsg);
 
   crow::json::wvalue response = ResponseHelper::make_response(err, errorMsg);
   return response;
@@ -33,6 +32,7 @@ crow::json::wvalue ThreadService::getThreads(const std::string& filter, const st
     data[i]["author_id"] = row["author_id"].as<std::string>();
     data[i]["community_id"] = row["community_id"].as<int>();
     data[i]["parent_thead_id"] = row["parent_thread_id"].as<int>();
+    data[i]["comment_count"] = row["comment_count"].as<int>();
     i++;
   }
   return data;
