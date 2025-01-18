@@ -33,6 +33,12 @@ file(GLOB MESSAGE_REPO_SOURCES "db/message/*.cpp")
 add_library(message_repo STATIC ${MESSAGE_REPO_SOURCES})
 target_link_libraries(message_repo PRIVATE connection_manager)
 
+# Source files for the thread repo
+file(GLOB THREAD_REPO_SOURCES "db/threads/*.cpp")
+add_library(thread_repo STATIC ${THREAD_REPO_SOURCES})
+target_link_libraries(thread_repo PRIVATE connection_manager)
+
+
 # Source files for the login service
 file(GLOB LOGIN_SERVICE_SOURCES "services/login/*.cpp")
 add_library(login_service STATIC ${LOGIN_SERVICE_SOURCES})
@@ -48,6 +54,11 @@ file(GLOB ROUTING_SERVICE_SOURCES "services/routing/*.cpp")
 add_library(routing_service STATIC ${ROUTING_SERVICE_SOURCES})
 target_link_libraries(routing_service PRIVATE message_repo app_helper)
 
+# source files for thread service
+file(GLOB THREAD_SERVICE_SOURCES "services/threads/*.cpp")
+add_library(thread_service STATIC ${THREAD_SERVICE_SOURCES})
+target_link_libraries(thread_service PRIVATE thread_repo app_helper)
+
 
 
 # Source files for the main executable
@@ -59,4 +70,5 @@ target_link_libraries(
   login_service
   user_service
   routing_service
+  thread_service
 )
