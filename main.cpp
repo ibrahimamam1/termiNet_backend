@@ -5,8 +5,8 @@
 #include "helpers/ResponseHelper.h"
 #include "services/login/login.h"
 #include "services/routing/routing.h"
-#include "services/users/users.h"
 #include "services/threads/threads.h"
+#include "services/users/users.h"
 #include <csignal>
 #include <exception>
 #include <iostream>
@@ -34,10 +34,6 @@ int main() {
     crow::json::wvalue response = LoginService::check_login(email, password);
     return response;
   });
-
- 
-
-
 
   // handle getting a user information
   CROW_ROUTE(app, "/users/<int>/<string>")
@@ -96,8 +92,8 @@ int main() {
         }
       });
 
-  //Threads
-   CROW_ROUTE(app, "/threads/new/")
+  // Threads
+  CROW_ROUTE(app, "/threads/new/")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
         try {
@@ -117,6 +113,11 @@ int main() {
         return response;
       });
 
+  CROW_ROUTE(app, "/threads/<string>/<string>")
+  ([](std::string filter, std::string value) {
+    crow::json::wvalue response = ThreadService::getThreads(filter,value);
+    return response;
+  });
 
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")
