@@ -18,10 +18,11 @@ create table if not exists threads(
   thread_id serial primary key,
   title varchar(200) not null,
   content text,
-  created_at date,
+  created_at timestamp,
   author_id text references users(user_id),
   community_id integer,
-  parent_thread_id integer
+  parent_thread_id integer,
+  comment_count integer default 0
 );
 
 

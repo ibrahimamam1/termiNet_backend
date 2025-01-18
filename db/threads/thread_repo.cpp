@@ -2,9 +2,8 @@
 #include "../manager/connection_manager.h"
 #include "thread_repo.h"
 
-int ThreadRepository::addNewThread(const std::string& title, const std::string& content,
-                           const std::string& created_at, const std::string& author_id,
-                           const int& community_id, const int& parent_thread_id, std::string& errorMsg)
+int ThreadRepository::addNewThread(const std::string& title, const std::string& content, const std::string& author_id,
+                                   const int& community_id, const int& parent_thread_id, std::string& errorMsg)
 {
   std::cout << "\t Thread repository Adding new Thread to db...\n";
   int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
@@ -28,9 +27,9 @@ int ThreadRepository::addNewThread(const std::string& title, const std::string& 
     conn.prepare(
         "insert_thread",
         "INSERT INTO threads(title, content, created_at, author_id, community_id, parent_thread_id) "
-        "VALUES ($1, $2, $3, $4, $5, $6)");
+        "VALUES ($1, $2, NOW(), $3, $4, $5)");
 
-    tx->exec_prepared("insert_thread", title, content, created_at, author_id, community_id, parent_thread_id);
+    tx->exec_prepared("insert_thread", title, content, author_id, community_id, parent_thread_id);
 
     tx->commit();
   } catch (const pqxx::sql_error &e) {
@@ -67,7 +66,7 @@ pqxx::result ThreadRepository::getThreads(const std::string& filter, const std::
     std::string query;
     
     if(filter.length() < 3){
-      query = "SELECT * FROM threads order by created_at desc";
+      query = "SELECT * FROM threads where parent_thread_id = 0 order by created_at desc";
       pqxx::result res{tx.exec(query)};
       errorMsg = "No Error";
       error_code = 200;
@@ -75,7 +74,7 @@ pqxx::result ThreadRepository::getThreads(const std::string& filter, const std::
       return res;
     
     }else{
-      std::string query = "SELECT * FROM threads WHERE " + filter + " = $1 order by created-at desc";
+      std::string query = "SELECT * FROM threads WHERE " + filter + " = $1 order by created_at desc";
       conn.prepare("get_threads_filtered", query);
       pqxx::result res{tx.exec_prepared("get_threads_filtered", filter_value)};
       errorMsg = "No Error";
