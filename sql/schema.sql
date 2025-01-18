@@ -14,6 +14,17 @@ create table if not exists profile_pics_bucket(
   user_id text references users(user_id)
 );
 
+create table if not exists threads(
+  thread_id serial primary key,
+  title varchar(200) not null,
+  content text,
+  created_at date,
+  author_id text references users(user_id),
+  community_id integer,
+  parent_thread_id integer
+);
+
+
 create table if not exists undelivered_messages(
   message_id serial primary key,
   sender_id integer,

@@ -6,6 +6,7 @@
 #include "services/login/login.h"
 #include "services/routing/routing.h"
 #include "services/users/users.h"
+#include "services/threads/threads.h"
 #include <csignal>
 #include <exception>
 #include <iostream>
@@ -94,6 +95,28 @@ int main() {
           return response;
         }
       });
+
+  //Threads
+   CROW_ROUTE(app, "/threads/new/")
+      .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
+        crow::json::wvalue response;
+        try {
+          std::cout << "Creating a new Thread:\n";
+          auto json_data = crow::json::load(req.body);
+          if (!json_data) {
+            std::cerr << "\tReceived Invalid Json\n";
+            response = ResponseHelper::make_response(400, "Invalid Json");
+            return response;
+          }
+          std::cout << "\tjson parsed succesffully\n";
+          response = ThreadService::addNewThread(json_data);
+        } catch (std::runtime_error e) {
+          std::cerr << e.what();
+          response = ResponseHelper::make_response(500, e.what());
+        }
+        return response;
+      });
+
 
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")
