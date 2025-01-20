@@ -38,6 +38,12 @@ file(GLOB THREAD_REPO_SOURCES "db/threads/*.cpp")
 add_library(thread_repo STATIC ${THREAD_REPO_SOURCES})
 target_link_libraries(thread_repo PRIVATE connection_manager)
 
+# Source files for the Category repo
+file(GLOB CATEGORY_REPO_SOURCES "db/categories/*.cpp")
+add_library(category_repo STATIC ${CATEGORY_REPO_SOURCES})
+target_link_libraries(category_repo PRIVATE connection_manager)
+
+
 
 # Source files for the login service
 file(GLOB LOGIN_SERVICE_SOURCES "services/login/*.cpp")
@@ -59,6 +65,11 @@ file(GLOB THREAD_SERVICE_SOURCES "services/threads/*.cpp")
 add_library(thread_service STATIC ${THREAD_SERVICE_SOURCES})
 target_link_libraries(thread_service PRIVATE thread_repo app_helper)
 
+file(GLOB CATEGORY_SERVICE_SOURCES "services/category/*.cpp")
+add_library(category_service STATIC ${CATEGORY_SERVICE_SOURCES})
+target_link_libraries(category_service PRIVATE category_repo app_helper)
+
+
 
 
 # Source files for the main executable
@@ -71,4 +82,5 @@ target_link_libraries(
   user_service
   routing_service
   thread_service
+  category_service
 )

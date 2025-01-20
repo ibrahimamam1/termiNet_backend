@@ -65,7 +65,7 @@ pqxx::result ThreadRepository::getThreads(const std::string& filter, const std::
     pqxx::work tx{conn};
     std::string query;
     
-    if(filter.length() < 3){
+    if(filter == "none"){
       query = "SELECT * FROM threads where parent_thread_id = 0 order by created_at desc";
       pqxx::result res{tx.exec(query)};
       errorMsg = "No Error";

@@ -7,6 +7,7 @@
 #include "services/routing/routing.h"
 #include "services/threads/threads.h"
 #include "services/users/users.h"
+#include "services/category/category.h"
 #include <csignal>
 #include <exception>
 #include <iostream>
@@ -92,7 +93,9 @@ int main() {
         }
       });
 
-  // Threads
+  // -----------------------------------------Threads-------------------------------------
+  
+  //adding new threads
   CROW_ROUTE(app, "/threads/new/")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
@@ -112,11 +115,20 @@ int main() {
         }
         return response;
       });
-
+  
+  //getting threads
   CROW_ROUTE(app, "/threads/<string>/<string>")
   ([](std::string filter, std::string value) {
     crow::json::wvalue response = ThreadService::getThreads(filter,value);
     return response;
+  });
+
+  //------------------------------CATEGORY----------------------------------------------  
+
+  //getting categories
+  CROW_ROUTE(app, "/categories/<string>/<string>")
+  ([](std::string filter, std::string value){
+    return CategoryService::getCategories(filter, value);
   });
 
   // messaging web socket
