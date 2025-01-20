@@ -3,3 +3,9 @@ As Integer
 MINVALUE 0
 No MAXVALUE
 OWNED BY users.user_id;
+
+create sequence if not exists COMMUNITY_SEQ
+As Integer
+MINVALUE 0
+No MAXVALUE
+OWNED BY communities.community_id;

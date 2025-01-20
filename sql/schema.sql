@@ -25,6 +25,46 @@ create table if not exists threads(
   comment_count integer default 0
 );
 
+create table if not exists communities(
+community_id integer primary key,
+name varchar(50) not null,
+description text,
+icon_image text,
+banner_image text,
+created_at timestamp
+);
+
+create table if not exists categories(
+    category_id serial primary key,
+    category_name text
+);
+insert into categories(category_name) values ('Art');
+insert into categories(category_name) values ('Science');
+insert into categories(category_name) values ('Sports');
+insert into categories(category_name) values ('Politics');
+insert into categories(category_name) values ('News');
+insert into categories(category_name) values ('Entertainment');
+insert into categories(category_name) values ('Technology');
+insert into categories(category_name) values ('Writing');
+insert into categories(category_name) values ('Pop culture');
+insert into categories(category_name) values ( 'Writing');
+insert into categories(category_name) values ( 'Popular Culture');
+insert into categories(category_name) values ( 'Anime');
+insert into categories(category_name) values ( 'Manga');
+insert into categories(category_name) values ( 'Video Games');
+insert into categories(category_name) values ( 'Movies');
+
+create table if not exists community_categories(
+    community_id integer,
+    category_id integer,
+    primary key (community_id, category_id)
+);
+
+create table if not exists users_communities(
+    user_id text,
+    community_id integer,
+    primary key(user_id, community_id)
+);
 
 create table if not exists undelivered_messages(
   message_id serial primary key,

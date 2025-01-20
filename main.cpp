@@ -7,6 +7,8 @@
 #include "services/routing/routing.h"
 #include "services/threads/threads.h"
 #include "services/users/users.h"
+#include "services/category/category.h"
+#include "services/community/community.h"
 #include <csignal>
 #include <exception>
 #include <iostream>
@@ -92,7 +94,9 @@ int main() {
         }
       });
 
-  // Threads
+  // -----------------------------------------Threads-------------------------------------
+  
+  //adding new threads
   CROW_ROUTE(app, "/threads/new/")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
@@ -112,12 +116,43 @@ int main() {
         }
         return response;
       });
-
+  
+  //getting threads
   CROW_ROUTE(app, "/threads/<string>/<string>")
   ([](std::string filter, std::string value) {
     crow::json::wvalue response = ThreadService::getThreads(filter,value);
     return response;
   });
+
+  //------------------------------CATEGORY----------------------------------------------  
+
+  //getting categories
+  CROW_ROUTE(app, "/categories/<string>/<string>")
+  ([](std::string filter, std::string value){
+    return CategoryService::getCategories(filter, value);
+  });
+
+  //----------------------------COMMUNITITES--------------------------------
+  //adding new communities
+  CROW_ROUTE(app, "/communities/new/")
+      .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
+        crow::json::wvalue response;
+        try {
+          std::cout << "Creating a new Community:\n";
+          auto json_data = crow::json::load(req.body);
+          if (!json_data) {
+            std::cerr << "\tReceived Invalid Json\n";
+            response = ResponseHelper::make_response(400, "Invalid Json");
+            return response;
+          }
+          std::cout << "\tjson parsed succesffully\n";
+          response = CommunityService::addNewCommunity(json_data);
+        } catch (std::runtime_error e) {
+          std::cerr << e.what();
+          response = ResponseHelper::make_response(500, e.what());
+        }
+        return response;
+      });
 
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")
