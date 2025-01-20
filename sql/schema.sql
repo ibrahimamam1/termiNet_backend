@@ -26,29 +26,14 @@ create table if not exists threads(
 );
 
 create table if not exists communities(
-community_id serial primary key,
+community_id integer primary key,
 name varchar(50) not null,
 description text,
 icon_image text,
 banner_image text,
-created_at date
+created_at timestamp
 );
 
-create table if not exists iconsBucket(
-    icon_id serial primary key,
-    filename text not null,
-    filedata BYTEA not null,
-    uploaded_by integer references users(user_id),
-    uploaded_at timestamp default current_timestamp
-);
-
-create table if not exists bannersBucket(
-    icon_id serial primary key,
-    filename text not null,
-    filedata BYTEA not null,
-    uploaded_by integer references users(user_id),
-    uploaded_at timestamp default current_timestamp
-);
 create table if not exists categories(
     category_id serial primary key,
     category_name text
@@ -75,6 +60,11 @@ create table if not exists community_categories(
     primary key (community_id, category_id)
 );
 
+create table if not exists users_communities(
+    user_id text,
+    community_id integer,
+    primary key(user_id, community_id)
+);
 
 create table if not exists undelivered_messages(
   message_id serial primary key,
