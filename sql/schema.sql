@@ -31,7 +31,8 @@ name varchar(50) not null,
 description text,
 icon_image text,
 banner_image text,
-created_at timestamp
+created_at timestamp,
+member_count integer default 0
 );
 
 create table if not exists categories(
