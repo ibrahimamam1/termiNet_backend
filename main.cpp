@@ -160,6 +160,14 @@ int main() {
       crow::json::wvalue response = CommunityService::getCommunities(filter, value);
       return response;
     });
+  //remove user from community
+  CROW_ROUTE(app, "/communities/users/remove/<string>/<int>")
+  ([](std::string user_id, int community_id){
+      crow::json::wvalue response = CommunityService::removeUserFromCommunity(user_id, community_id);
+      return response;
+    });
+
+
 
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")
