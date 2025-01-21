@@ -14,7 +14,7 @@ crow::json::wvalue CategoryService::getCategories(const std::string& filter, con
   int i = 0;
   if(err  == 200){
     for(const auto row : res){
-        data[i]["category_id"] = row[0].as<std::string>();
+        data[i]["category_id"] = row[0].as<int>();
         data[i]["category_name"] = row[1].as<std::string>();
         i++;
     }

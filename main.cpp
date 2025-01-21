@@ -153,6 +153,13 @@ int main() {
         }
         return response;
       });
+  //retrieving communities
+  CROW_ROUTE(app, "/communities/<string>/<string>")
+  ([](std::string filter, std::string value){
+  std::cout << "Community Route: got Your request\n";
+      crow::json::wvalue response = CommunityService::getCommunities(filter, value);
+      return response;
+    });
 
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")

@@ -1,6 +1,7 @@
 #include "community.h"
 #include "../../db/community/community_repo.h"
 #include "../../helpers/ResponseHelper.h"
+#include <pqxx/internal/statement_parameters.hxx>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,7 @@ CommunityService::addNewCommunity(const crow::json::rvalue &jsonData) {
   std::vector<int> categories;
   if (jsonData.has("categories")) {
     const crow::json::rvalue &categoriesJson = jsonData["categories"];
+    std::cout << categoriesJson << std::endl;
     for (const auto &category : categoriesJson) {
       categories.push_back(category.i());
     }
@@ -30,5 +32,32 @@ CommunityService::addNewCommunity(const crow::json::rvalue &jsonData) {
   else
     returnData["Status"] = "Failed";
 
+  return returnData;
+}
+
+crow::json::wvalue CommunityService::getCommunities(const std::string& filter, const std::string& value){
+  
+  std::cout << "Community Service: getting Communities\n";
+  int err = 0;
+  std::string errMsg = "";
+  pqxx::result res = CommunityRepository::getCommunities(filter, value, err, errMsg);
+
+  std::cout << "Community Service: got results\n";
+  crow::json::wvalue returnData = ResponseHelper::make_response(err, errMsg);
+  if(err == 200){
+  std::cout << "Community Service: Good status code\n";
+    int i=0;
+    for(auto row : res){
+      crow::json::wvalue community;
+      returnData[i]["community_id"] = row[0].as<int>();
+      returnData[i]["community_name"] =  row[1].as<std::string>();
+      returnData[i]["community_description"] =  row[2].as<std::string>();
+      returnData[i]["icon_image"] =  row[3].as<std::string>();
+      returnData[i]["banner_image"] =  row[4].as<std::string>();
+      returnData[i]["created_at"] =  row[5].as<std::string>();
+      returnData[i]["member_count"] =  row[6].as<int>();
+      i++;
+    }
+  }
   return returnData;
 }
