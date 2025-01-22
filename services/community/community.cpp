@@ -61,3 +61,31 @@ crow::json::wvalue CommunityService::getCommunities(const std::string& filter, c
   }
   return returnData;
 }
+  
+crow::json::wvalue CommunityService::removeUserFromCommunity(const std::string& user_id, const int community_id){
+  std::string errMsg = "";
+  int err = CommunityRepository::removeUserFromCommunity(user_id, community_id, errMsg);
+  std::cout << "remove user from community : err = " << err << " msg : " << errMsg << std::endl;
+  crow::json::wvalue returnData = ResponseHelper::make_response(err, errMsg);
+  if(err == 200){
+    returnData["Status"] = true;
+  }
+  else{
+    returnData["Status"] = false;
+  }
+  return returnData;
+}
+
+crow::json::wvalue CommunityService::addUserToCommunity(const std::string& user_id, const int community_id){
+  std::string errMsg = "";
+  int err = CommunityRepository::addUserToCommunity(user_id, community_id, errMsg);
+  std::cout << "add user to community : err = " << err << " msg : " << errMsg << std::endl;
+  crow::json::wvalue returnData = ResponseHelper::make_response(err, errMsg);
+  if(err == 200){
+    returnData["Status"] = true;
+  }
+  else{
+    returnData["Status"] = false;
+  }
+  return returnData;
+}

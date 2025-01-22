@@ -33,8 +33,7 @@ BEGIN
     -- Encode the binary data as a base64 string
     default_image_base64 := encode(default_image, 'base64');
     
-    -- Insert the default profile picture into the profile_pics_bucket table
-    INSERT INTO profile_pics_bucket(image, user_id) VALUES (default_image_base64, NEW.user_id);
+    NEW.profile_picture = default_image_base64;
     
     RETURN NEW;
 EXCEPTION
@@ -44,6 +43,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER insert_profile_picture_trigger
-AFTER INSERT ON users
+BEFORE INSERT ON users
 FOR EACH ROW
 EXECUTE FUNCTION insertDefaultProfilePicture();
