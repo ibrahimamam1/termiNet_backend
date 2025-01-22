@@ -39,19 +39,8 @@ crow::json::wvalue UserService::getUser(const std::string& field, const std::str
         userData["body"]["user_email"] = row["user_email"].as<std::string>();
         userData["body"]["user_bio"] = row["user_bio"].as<std::string>();
         userData["body"]["created_at"] = row["created_at"].as<std::string>();
-    
-    // Get profile pic
-        pqxx::result profile_pic = UserRepository::getUserProfilePic(user_id);
-        if (!profile_pic.empty()) {
-            std::string base64_image = profile_pic[0]["image"].c_str();
-            
-            
-            // Add to response
-            userData["body"]["profile_image"] = base64_image;
-        } else {
-            userData["body"]["profile_image"] = "";
-        }
-  }
+        userData["body"]["profile_picture"] = row["profile_picture"].as<std::string>();
+      }
     return userData;
 }
 
@@ -116,7 +105,10 @@ crow::json::wvalue UserService::createUser(crow::json::rvalue jsonData){
 }
 
 //update user functions
-crow::json::wvalue UserService::updateUser(const std::string& field, const std::string& new_value, const std::string& key){ 
+crow::json::wvalue UserService::updateUser(const crow::json::rvalue& jsonData){
+  std::string field = jsonData["field"].s();
+  std::string new_value = jsonData["new_data"].s();
+  std::string key = jsonData["id"].s();
   bool success = UserRepository::updateUser(field, new_value, key);
   
   crow::json::wvalue returnData;

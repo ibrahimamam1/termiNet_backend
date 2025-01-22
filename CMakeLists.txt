@@ -48,6 +48,11 @@ file(GLOB COMMUNITY_REPO_SOURCES "db/community/*.cpp")
 add_library(community_repo STATIC ${COMMUNITY_REPO_SOURCES})
 target_link_libraries(community_repo PRIVATE connection_manager)
 
+# Source files for the Search repo
+file(GLOB SEARCH_REPO_SOURCES "db/search/*.cpp")
+add_library(search_repo STATIC ${SEARCH_REPO_SOURCES})
+target_link_libraries(search_repo PRIVATE connection_manager)
+
 
 
 # Source files for the login service
@@ -80,7 +85,10 @@ file(GLOB COMMUNITY_SERVICE_SOURCES "services/community/*.cpp")
 add_library(community_service STATIC ${COMMUNITY_SERVICE_SOURCES})
 target_link_libraries(community_service PRIVATE community_repo app_helper)
 
-
+# source files for community service
+file(GLOB SEARCH_SERVICE_SOURCES "services/search/*.cpp")
+add_library(search_service STATIC ${SEARCH_SERVICE_SOURCES})
+target_link_libraries(search_service PRIVATE search_repo app_helper)
 
 
 # Source files for the main executable
@@ -95,4 +103,5 @@ target_link_libraries(
   thread_service
   category_service
   community_service
+  search_service
 )

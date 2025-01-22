@@ -9,6 +9,7 @@
 #include "services/users/users.h"
 #include "services/category/category.h"
 #include "services/community/community.h"
+#include "services/search/search.h"
 #include <csignal>
 #include <exception>
 #include <iostream>
@@ -77,15 +78,13 @@ int main() {
   CROW_ROUTE(app, "/update/users/")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
-        std::string key = req.get_header_value("id");
         try {
           auto json_data = crow::json::load(req.body);
           if (!json_data) {
             response = ResponseHelper::make_response(400, "Invalid Json");
             return response;
           }
-          response = UserService::updateUser(json_data["field"].s(),
-                                             json_data["new_data"].s(), key);
+          response = UserService::updateUser(json_data);
           return response;
         } catch (std::runtime_error e) {
           std::cerr << e.what();
@@ -166,8 +165,22 @@ int main() {
       crow::json::wvalue response = CommunityService::removeUserFromCommunity(user_id, community_id);
       return response;
     });
+  //add user to community
+  CROW_ROUTE(app, "/communities/users/add/<string>/<int>")
+  ([](std::string user_id, int community_id){
+      crow::json::wvalue response = CommunityService::addUserToCommunity(user_id, community_id);
+      return response;
+    });
 
 
+
+  //-----------------------------SEARCH------------------------------------//
+  //search for a target string
+  CROW_ROUTE(app, "/search/<string>/")
+  ([](std::string target){
+      crow::json::wvalue response = SearchService::searchFor(target);
+      return response;
+    });
 
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")

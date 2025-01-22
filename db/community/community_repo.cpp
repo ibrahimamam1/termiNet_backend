@@ -161,3 +161,41 @@ catch (const std::exception &e) {
 }
 return 500;
 }
+int CommunityRepository::addUserToCommunity(const std::string &user_id,
+                                                 const int &community_id,
+                                                 std::string& errMsg) {
+  int conn_index = ConnectionManager::getInstance()->getConnectionIndex();
+
+  if (conn_index == -1) {
+    errMsg = "No database connections available\n";
+    return 503;
+  }
+  try {
+    pqxx::connection &conn =
+        ConnectionManager::getInstance()->getConnection(conn_index);
+    if (!conn.is_open()) {
+      errMsg = "Failed to connect to database\n";
+      return 500;
+    }
+    pqxx::work tx{conn};
+    conn.prepare("add_user",
+                 "INSERT INTO users_communities(user_id, community_id) VALUES($1, $2)"
+                 );
+    pqxx::result res{tx.exec_prepared("add_user", user_id, community_id)};
+    tx.commit();
+    errMsg = "No Error";
+    ConnectionManager::getInstance()->releaseConnection(conn_index);
+    return 200;
+  }
+catch (const pqxx::sql_error &e) {
+  std::cerr << "Database error: " << e.what();
+  errMsg = "Database error: " + std::string(e.what());
+  ConnectionManager::getInstance()->releaseConnection(conn_index);
+}
+catch (const std::exception &e) {
+  std::cerr << "Unexpected Error Occurred: " << e.what();
+  errMsg = "Unexpected error: " + std::string(e.what());
+  ConnectionManager::getInstance()->releaseConnection(conn_index);
+}
+return 500;
+}
