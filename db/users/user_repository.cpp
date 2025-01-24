@@ -26,8 +26,10 @@ pqxx::result UserRepository::getUser(const std::string &field,
     }
     pqxx::work tx{conn};
 
-    conn.prepare("get_user", "select * from users where " + field + "= $1");
-    pqxx::result res{tx.exec_prepared("get_user", value)};
+    // Build the query safely with quoted field name
+    std::string query = 
+        "SELECT * FROM users WHERE " + tx.quote_name(field) + " = $1";
+    pqxx::result res = tx.exec_params(query, value);
 
     if (res.empty()) {
       error_msg = "User Not Found\n";
@@ -39,14 +41,19 @@ pqxx::result UserRepository::getUser(const std::string &field,
     ConnectionManager::getInstance()->releaseConnection(conn_index);
     return res;
 
-  } catch (std::exception e) {
-    std::cerr << "Unexpected Error Occured " << e.what();
+  } catch (const pqxx::sql_error &e) {
+    std::cerr << "Database error: " << e.what();
+    error_code = 500;
+    error_msg = "Database error: " + std::string(e.what());
+    ConnectionManager::getInstance()->releaseConnection(conn_index);
+  } catch (const std::exception &e) {
+    std::cerr << "Unexpected Error Occurred: " << e.what();
+    error_code = 500;
+    error_msg = "Unexpected error: " + std::string(e.what());
     ConnectionManager::getInstance()->releaseConnection(conn_index);
   }
   return pqxx::result();
-}
-
-void UserRepository::addNewUser(const std::string &user_id,
+}void UserRepository::addNewUser(const std::string &user_id,
                                 const std::string &name,
                                 const std::string &email,
                                 const std::string &dob, const std::string &bio,
