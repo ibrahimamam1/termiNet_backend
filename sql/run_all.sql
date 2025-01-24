@@ -4,12 +4,12 @@
 \set AUTOCOMMIT off
 
 -- Run scripts in sequence
-\i ./schema.sql
-\i ./sequence_generators.sql
-\i ./triggers.sql
-\i ./new_user.sql
-\i ./new_thread.sql
-\i ./login_check.sql
+\i ../sql/schema.sql
+\i ../sql/sequence_generators.sql
+\i ../sql/triggers.sql
+\i ../sql/new_user.sql
+\i ../sql/new_thread.sql
+\i ../sql/login_check.sql
 
 
 \set AUTOCOMMIT on

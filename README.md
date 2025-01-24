@@ -35,7 +35,7 @@ Before running the backend, ensure you have the following installed:
 
 2. **Run the Database script**:
    ```bash
-   psql -U <your_username> -d <database_name> -h localhost -p 5432 -f sql/run_all.sql
+   psql -U <your_username> -d <database_name> -h localhost -p 5432 -f ../sql/run_all.sql
 
 3. **Edit your .ENV FILE**:
    Edit the .env file found in the project root directory to contain your database information you just created.
