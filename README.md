@@ -31,10 +31,16 @@ Before running the backend, ensure you have the following installed:
     ```bash
     sudo -iu postgres 
     createdb <database_name> -O <your_username>  # Replace with your details
-    psql -U <your_username> -d <database_name> -h localhost -p 5432 -f sql/run_all.sql
     exit
 
+2. **Run the Database script**:
+   ```bash
+   psql -U <your_username> -d <database_name> -h localhost -p 5432 -f sql/run_all.sql
+
+3. **Edit your .ENV FILE**:
+   Edit the .env file found in the project root directory to contain your database information you just created.
+
 ## Run the Application
-    
+1. Execute the App
     ```bash
       ./terminet
