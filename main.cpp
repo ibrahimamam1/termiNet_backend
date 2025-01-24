@@ -11,9 +11,7 @@
 #include "services/community/community.h"
 #include "services/search/search.h"
 #include <csignal>
-#include <exception>
 #include <iostream>
-#include <iterator>
 #include <memory>
 #include <ostream>
 #include <stdexcept>
@@ -31,14 +29,16 @@ int main() {
 
   CROW_ROUTE(app, "/")([]() { return "Hello World"; });
 
-  // handle login check
+  //-------------------------------LOGIN------------------------/
+  // user login check
   CROW_ROUTE(app, "/login/<string>/<string>")
   ([](std::string email, std::string password) {
     crow::json::wvalue response = LoginService::check_login(email, password);
     return response;
   });
 
-  // handle getting a user information
+  //----------------------------USERS----------------------------/
+  // getting a user's information
   CROW_ROUTE(app, "/users/<int>/<string>")
   ([](int code, std::string id) {
     crow::json::wvalue response;
@@ -53,7 +53,7 @@ int main() {
     return response;
   });
 
-  // handle adding new user
+  // add new user
   CROW_ROUTE(app, "/users/")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
@@ -74,7 +74,7 @@ int main() {
         return response;
       });
 
-  // updating user information
+  // update user information
   CROW_ROUTE(app, "/update/users/")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
@@ -95,19 +95,16 @@ int main() {
 
   // -----------------------------------------Threads-------------------------------------
   
-  //adding new threads
+  //add new thread
   CROW_ROUTE(app, "/threads/new/")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
         try {
-          std::cout << "Creating a new Thread:\n";
           auto json_data = crow::json::load(req.body);
           if (!json_data) {
-            std::cerr << "\tReceived Invalid Json\n";
             response = ResponseHelper::make_response(400, "Invalid Json");
             return response;
           }
-          std::cout << "\tjson parsed succesffully\n";
           response = ThreadService::addNewThread(json_data);
         } catch (std::runtime_error e) {
           std::cerr << e.what();
@@ -116,7 +113,7 @@ int main() {
         return response;
       });
   
-  //getting threads
+  //get threads
   CROW_ROUTE(app, "/threads/<string>/<string>")
   ([](std::string filter, std::string value) {
     crow::json::wvalue response = ThreadService::getThreads(filter,value);
@@ -125,14 +122,14 @@ int main() {
 
   //------------------------------CATEGORY----------------------------------------------  
 
-  //getting categories
+  //get categories
   CROW_ROUTE(app, "/categories/<string>/<string>")
   ([](std::string filter, std::string value){
     return CategoryService::getCategories(filter, value);
   });
 
   //----------------------------COMMUNITITES--------------------------------
-  //adding new communities
+  //add new communities
   CROW_ROUTE(app, "/communities/new/")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         crow::json::wvalue response;
@@ -152,19 +149,22 @@ int main() {
         }
         return response;
       });
-  //retrieving communities
+  
+  //retrieve communities
   CROW_ROUTE(app, "/communities/<string>/<string>")
   ([](std::string filter, std::string value){
   std::cout << "Community Route: got Your request\n";
       crow::json::wvalue response = CommunityService::getCommunities(filter, value);
       return response;
     });
+
   //remove user from community
   CROW_ROUTE(app, "/communities/users/remove/<string>/<int>")
   ([](std::string user_id, int community_id){
       crow::json::wvalue response = CommunityService::removeUserFromCommunity(user_id, community_id);
       return response;
     });
+  
   //add user to community
   CROW_ROUTE(app, "/communities/users/add/<string>/<int>")
   ([](std::string user_id, int community_id){
@@ -182,6 +182,7 @@ int main() {
       return response;
     });
 
+  //--------------------------MESSAGES------------------------------------//
   // messaging web socket
   CROW_WEBSOCKET_ROUTE(app, "/ws/")
       .onopen([&](crow::websocket::connection &conn) {
