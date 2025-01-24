@@ -1,6 +1,6 @@
 # TermiNet Backend
 
-Backend repository for TermiNet, a reddit inspired networking application written in c++.
+Backend repository for [TermiNet](https://github.com/ibrahimamam1/termiNet), a reddit inspired networking application written in c++.
 
 ## Prerequisites
 
