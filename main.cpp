@@ -3,6 +3,7 @@
 #include "crow_all.h"
 #include "db/manager/connection_manager.h"
 #include "helpers/ResponseHelper.h"
+#include "helpers/AppHelper.h"
 #include "services/login/login.h"
 #include "services/routing/routing.h"
 #include "services/threads/threads.h"
@@ -25,8 +26,16 @@ int main() {
   crow::SimpleApp app;
 
   // initialise database connection
-  ConnectionManager::getInstance()->init("dbname=terminet user=rgb password=");
-
+  std::string dbname = "";
+  std::string username ="";
+  int read = AppHelper::getEnvData(username, dbname);
+  if(!read)
+    exit(1);
+  
+  std::string initString = "dbname="+dbname+" user="+username+" password=";
+  ConnectionManager::getInstance()->init(initString);
+  
+  //-------------------------------ROUTES-----------------------/
   CROW_ROUTE(app, "/")([]() { return "Hello World"; });
 
   //-------------------------------LOGIN------------------------/

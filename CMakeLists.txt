@@ -97,6 +97,7 @@ target_link_libraries(
   terminet
   PRIVATE
   pqxx
+  app_helper
   login_service
   user_service
   routing_service
