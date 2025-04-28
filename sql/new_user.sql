@@ -20,25 +20,22 @@ EXECUTE FUNCTION hashPass();
 CREATE OR REPLACE FUNCTION insertDefaultProfilePicture()
 RETURNS TRIGGER AS $$
 DECLARE
-    default_image BYTEA;
     default_image_base64 TEXT;
 BEGIN
     -- Load the default profile picture
-    default_image := pg_read_binary_file('default_profile.png');
+    SELECT data
+    INTO default_image_base64
+    FROM default_image
+    WHERE id = 1;
     
-    IF default_image IS NULL THEN
+    IF default_image_base64 IS NULL THEN
         RAISE EXCEPTION 'Could not load default profile picture';
     END IF;
     
-    -- Encode the binary data as a base64 string
-    default_image_base64 := encode(default_image, 'base64');
     
     NEW.profile_picture = default_image_base64;
     
     RETURN NEW;
-EXCEPTION
-    WHEN OTHERS THEN
-        RAISE EXCEPTION 'Failed to insert default profile picture: %', SQLERRM;
 END;
 $$ LANGUAGE plpgsql;
 
