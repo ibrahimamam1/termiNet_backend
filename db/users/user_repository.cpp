@@ -53,7 +53,8 @@ pqxx::result UserRepository::getUser(const std::string &field,
     ConnectionManager::getInstance()->releaseConnection(conn_index);
   }
   return pqxx::result();
-}void UserRepository::addNewUser(const std::string &user_id,
+}
+void UserRepository::addNewUser(const std::string &user_id,
                                 const std::string &name,
                                 const std::string &email,
                                 const std::string &dob, const std::string &bio,
